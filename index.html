@@ -1,24 +1,64 @@
-<!--
-    Author: Sungguk Cha
-    Date:   8 Sep. 2022
--->
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <script>
-        const urltext = window.location.href;
-        const url = new URL(urltext);
-        const urlParams = url.searchParams;
-        const ga4id = urlParams.get('id');
-        const tag = urlParams.get('tag');
-        
-        document.title = tag
-        window.resizeTo(1, 1)
-    </script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id="+ga4id></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', ga4id);
-    </script>
+  <meta charset="UTF-8">
+  <title>Tracking</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 1px;
+      width: 1px;
+      overflow: hidden;
+    }
+  </style>
+  <script>
+    // Parse GA4 ID and tag from the URL
+    const url = new URL(window.location.href);
+    const ga4id = url.searchParams.get('id');
+    const tag = url.searchParams.get('tag') || 'NotionTracker';
+
+    // Fallback: delay tracking if gtag is slow to load
+    function triggerTracking() {
+      if (!ga4id) return;
+
+      // Set custom page title for tracking (optional)
+      document.title = tag;
+
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+
+      // Initialize GA4
+      gtag('js', new Date());
+
+      // Trigger GA4 config with custom page title
+      gtag('config', ga4id, {
+        page_title: tag,
+        page_path: '/' + tag
+      });
+    }
+
+    // Wait for gtag to load, then trigger
+    window.addEventListener('load', () => {
+      setTimeout(triggerTracking, 300); // slight delay to ensure script loads
+    });
+  </script>
+
+  <!-- Load GA4 script dynamically using the GA4 ID -->
+  <script id="ga4-loader">
+    (function() {
+      const script = document.createElement('script');
+      const ga4id = new URL(window.location.href).searchParams.get('id');
+      if (ga4id) {
+        script.async = true;
+        script.src = 'https://www.googletagmanager.com/gtag/js?id=' + ga4id;
+        document.head.appendChild(script);
+      }
+    })();
+  </script>
 </head>
-<a img src="none.gif"></a>
+<body>
+  <!-- Transparent 1x1 image as fallback visual element -->
+  <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" width="1" height="1" alt="." />
+</body>
+</html>
