@@ -2,63 +2,58 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Tracking</title>
+  <title>Loading...</title>
+  <script>
+    // Parse GA4 ID and tag from URL parameters
+    const url = new URL(window.location.href);
+    const ga4id = url.searchParams.get('id');
+    const tag = url.searchParams.get('tag') || "notion";
+
+    // Set document title to tag
+    document.title = tag;
+
+    // Inject GA4 script dynamically
+    const gtagScript = document.createElement("script");
+    gtagScript.async = true;
+    gtagScript.src = `https://www.googletagmanager.com/gtag/js?id=${ga4id}`;
+    document.head.appendChild(gtagScript);
+
+    // Wait for script to load, then fire GA4 tracking
+    gtagScript.onload = () => {
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ dataLayer.push(arguments); }
+
+      gtag('js', new Date());
+      gtag('config', ga4id, {
+        page_title: tag,
+        page_path: '/' + encodeURIComponent(tag)
+      });
+
+      console.log("GA4 tracking triggered for:", tag);
+    };
+  </script>
+
   <style>
     html, body {
       margin: 0;
       padding: 0;
-      height: 1px;
-      width: 1px;
-      overflow: hidden;
+      background: transparent;
+      height: 100%;
+      width: 100%;
+    }
+
+    .tracker {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      font-size: 12px;
+      color: #ccc;
     }
   </style>
-  <script>
-    // Parse GA4 ID and tag from the URL
-    const url = new URL(window.location.href);
-    const ga4id = url.searchParams.get('id');
-    const tag = url.searchParams.get('tag') || 'NotionTracker';
-
-    // Fallback: delay tracking if gtag is slow to load
-    function triggerTracking() {
-      if (!ga4id) return;
-
-      // Set custom page title for tracking (optional)
-      document.title = tag;
-
-      window.dataLayer = window.dataLayer || [];
-      function gtag() { dataLayer.push(arguments); }
-
-      // Initialize GA4
-      gtag('js', new Date());
-
-      // Trigger GA4 config with custom page title
-      gtag('config', ga4id, {
-        page_title: tag,
-        page_path: '/' + tag
-      });
-    }
-
-    // Wait for gtag to load, then trigger
-    window.addEventListener('load', () => {
-      setTimeout(triggerTracking, 300); // slight delay to ensure script loads
-    });
-  </script>
-
-  <!-- Load GA4 script dynamically using the GA4 ID -->
-  <script id="ga4-loader">
-    (function() {
-      const script = document.createElement('script');
-      const ga4id = new URL(window.location.href).searchParams.get('id');
-      if (ga4id) {
-        script.async = true;
-        script.src = 'https://www.googletagmanager.com/gtag/js?id=' + ga4id;
-        document.head.appendChild(script);
-      }
-    })();
-  </script>
 </head>
+
 <body>
-  <!-- Transparent 1x1 image as fallback visual element -->
-  <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" width="1" height="1" alt="." />
+  <div class="tracker">📊 Tracking…</div>
 </body>
 </html>
